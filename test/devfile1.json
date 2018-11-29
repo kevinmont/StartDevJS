@@ -1,0 +1,34 @@
+{
+    "name": "xxxx",
+    "model": "mvc",
+    "version": "1.0",
+    "language": "js",
+    "modules": {
+        "data": {
+            "mysql": {
+                "ulr": "mysql",
+                "port": "",
+                "data": "",
+                "user": "",
+                "password": "",
+                "required": false
+            }
+        }
+    },
+    "utils": {
+        "log4js": {
+            "name": "winston"
+        },
+        "xlxscreator": {},
+        "uploder": {}
+    },
+    "extra": {
+        "rest-consumer": {
+            "modules": [
+                "net-suit",
+                "generic"
+            ]
+        }
+    },
+    "schema": {}
+}
