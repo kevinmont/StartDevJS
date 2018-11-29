@@ -1,0 +1,24 @@
+{
+  "name": "startdev-cli",
+  "version": "1.0.0",
+  "description": "A client line interface for automating bootstraps",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint index.js"
+  },
+  "keywords": [
+    "devjs",
+    "starjs-cli",
+    "starjs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^2.19.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.9.0",
+    "mocha": "^5.2.0"
+  }
+}
