@@ -1,0 +1,13 @@
+{
+    "files":[
+        "startdevjs/**/*.ts"
+    ],
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "target": "es5",
+        "outDir": "./src/",
+        "typeRoots": [
+            "./node_modules/@types"
+        ]
+    }
+}

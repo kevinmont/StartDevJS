@@ -1,18 +1,19 @@
 {
-    "name": "xxxx",
+    "name": "xxxxx",
     "model": "mvc",
     "version": "1.0",
-    "language": "js",
+    "language": "ts",
     "modules": {
-        "data": {
-            "mysql": {
-                "ulr": "mysql",
-                "port": "",
-                "data": "",
-                "user": "",
-                "password": "",
-                "required": false
-            }
+
+        "mysql": {
+            "required": false
+        },
+        "mongodb": {
+            "required": false
+        },
+
+        "sftp": {
+
         }
     },
     "utils": {
