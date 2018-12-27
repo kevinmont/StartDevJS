@@ -1,12 +1,13 @@
+import * as writter from './writter';
 import * as fs from 'fs';
 let Lang:any = fs.readFileSync('../utils/languagesDef.json');
 const Languages=JSON.parse(Lang);
 let isValid: boolean= false;
-export function readStartDevFile(PATH: string) {
+export async function readStartDevFile(PATH: string) {
     let data: any = fs.readFileSync(PATH);
     data = JSON.parse(data);
     
-if(Object.keys(Languages).indexOf(data.language)!=-1){
+if(Object.keys(Languages).indexOf(data['language'])!=-1){
    isValid=true;
 if(Object.keys(data).indexOf('name')==-1){
    console.log("Falta definir un nombre para el proyecto, Propiedad: 'name' "); 
@@ -35,12 +36,14 @@ if(Object.keys(data).indexOf('name')==-1){
  }
  
  if(isValid){
-    console.log("languaje: "+Languages[data.language].name);
-    Object.keys(data.modules).forEach(element =>{
+     console.log("Patrón de diseño: " + data['model'] );
+    console.log("languaje: "+Languages[data['language']]['name']);
+    Object.keys(data['modules']).forEach(element =>{
         console.log(`Module detected:  ${element}`);
     });
     
     console.log("StartDevFile Valido");
+   console.log(await writter.buildProject(data));
 }else{
     console.log("StartDevFile no valido");
 }

@@ -1,6 +1,6 @@
 {
     "files":[
-        "startdevjs/**/*.ts"
+        "startdevjs/index.ts"
     ],
     "compilerOptions": {
         "noImplicitAny": true,

@@ -1,0 +1,8 @@
+{
+    "ModelName": "MVC",
+    "Libs": "Libs",
+    "Models": "Models",
+    "Controller": "Controller",
+    "Utils": "Utils",
+    "ServerApp": "App"
+}
