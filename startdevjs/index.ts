@@ -9,6 +9,6 @@ program
     .command('read-file <path>')
     .alias('rf')
     .description(' --> Lectura del fichero StartDevJs File')
-    .action( async (path) => await reader.readStartDevFile(path) );
+    .action( async(path) => await reader.readStartDevFile(path) );
 
 program.parse(process.argv);

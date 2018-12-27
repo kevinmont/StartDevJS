@@ -3,7 +3,7 @@ import * as fs from 'fs';
 let Lang:any = fs.readFileSync('../utils/languagesDef.json');
 const Languages=JSON.parse(Lang);
 let isValid: boolean= false;
-export async function readStartDevFile(PATH: string) {
+export async function readStartDevFile(PATH: string){
     let data: any = fs.readFileSync(PATH);
     data = JSON.parse(data);
     
@@ -43,7 +43,8 @@ if(Object.keys(data).indexOf('name')==-1){
     });
     
     console.log("StartDevFile Valido");
-   console.log(await writter.buildProject(data));
+    console.log(await writter.buildProject(data));
+    return;
 }else{
     console.log("StartDevFile no valido");
 }
@@ -52,6 +53,7 @@ if(Object.keys(data).indexOf('name')==-1){
     console.log("Lenguaje no valido");
 
     }
-    
+
+    return ;
 }
 

@@ -8,6 +8,7 @@
         "outDir": "./src/",
         "typeRoots": [
             "./node_modules/@types"
-        ]
+        ],
+        "lib": [ "es2015" ] 
     }
 }
