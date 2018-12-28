@@ -1,4 +1,6 @@
 import * as mysql from 'mysql';
+import * as riak  from 'basho-riak-client';
+let fs = require('fs');
 export class connectMysql {
         public pool: mysql.Pool;
         public config: any;
