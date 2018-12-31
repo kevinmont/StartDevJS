@@ -1,0 +1,46 @@
+{
+  "netsuite": {
+    "item": {
+      "pass": "",
+      "name": ""
+    }
+  },
+  "pool": {
+    "mysql": ""
+  },
+  "dev": {
+    "pass": "",
+    "username": {
+      "name": {
+        "clave": ""
+      },
+      "names": {
+        "claves": "",
+        "clave1": {
+          "hola": {
+            "server": {
+              "gg": {
+                "html": ""
+              }
+            }
+          },
+          "hola2": {
+            "server": {
+              "ss": ""
+            }
+          }
+        }
+      }
+    }
+  },
+  "mysql": {
+    "host": "",
+    "user": "",
+    "passwords": "",
+    "databasse": ""
+  },
+  "sftp": {
+    "port": "",
+    "url": ""
+  }
+}
