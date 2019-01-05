@@ -1,6 +1,8 @@
 import * as servlet from './http-startdev';
 import * as fspath from 'fs-path';
+import * as nodeHelper from '../utils/node-helper';
 import * as fs from 'fs';
+import * as Initializer from '../utils/ControllerHelper';
 export async function buildProject(data: any){
     let response = await servlet.processData(data);
     console.log(response);
@@ -29,6 +31,7 @@ export async function buildProject(data: any){
     let properties:any[]=[];
     let modulesName:any=Object.keys(response['modules']); //Se obtienen los metadatos de los modulos a generar
     let npmDep:string[]=[];
+    let CoreModules=await nodeHelper.getCoreModulesNode();
     for(let i=0;i<modulesName.length;i++){ // por cada modulo se procede a realizar las siguientes operaciones
         PATH=`../src/${data['name']}/${response['pattern']['Libs']}/${modulesName[i]}Module.ts`; //Creando el path de escritura de los modulos solicitados a generar
         ModulesPath.push(PATH); //Se guardan los directorios de los modulos generados
@@ -37,11 +40,12 @@ export async function buildProject(data: any){
         console.log(content.toString('utf-8')); // El buffer se cambia a string para poder leér el codigo fuente
         await fspath.writeFileSync(PATH,content.toString('utf-8')); // Se escribe el modulo en el directorio antes generado
         properties.push(await readProperties(content.toString('utf-8'))); // Se obtienen las propiedades del codigo fuente para generar el config.json global
-        let npmDepRes=await readNpmDependencies(await content.toString('utf-8')); // Se obtienen las dependencias de NPM solicitadas en el codigo fuente
+        let npmDepRes=await readNpmDependencies(await content.toString('utf-8'),CoreModules); // Se obtienen las dependencias de NPM solicitadas en el codigo fuente
         if(npmDepRes!=""){ // Si hay dependencias a descargar de NPM 
         npmDep.push(npmDepRes); // Se agregan dichas dependencias a un array
         }    
     }
+    Initializer.constructInitializer(modulesName,ModulesPath,data['name']);
     installNPMDependencies(npmDep,data['name']); // El arreglos con las dependencias de NPM y el nombre del proyecto se mandan al metodo InstallNPMDepdencies
     buildConfigJSON(properties,data['name']);// Se mandan las propiedades de todos los modulo y el nombre del proyecto para generar el archivo de configuración
     return "Proyecto construido"; //Proyecto construido
@@ -97,7 +101,7 @@ configJSON= mergeProperties(configObject); // Se genera el archivo de configurac
 await fspath.writeFileSync(`../src/${pathConfig}/config/config.json`,JSON.stringify(configJSON,null,2)); //Se escribe el fichero config.json global con un formato de ajuste de linea
 }
 
-async function readNpmDependencies(ModulesCode: any){ // Metodo que leé todas las dependencias necesarias por parte del modulo y retorna un string con el comando para instalar cada una de las dependecias de NPM, con typado y normales
+async function readNpmDependencies(ModulesCode: any,CoreModules:any){ // Metodo que leé todas las dependencias necesarias por parte del modulo y retorna un string con el comando para instalar cada una de las dependecias de NPM, con typado y normales
     let NPMTypesDepencencies:string[]=[]; // Se declara un arreglo de las dependencias de NPM con typado
     let NPMDepencencies: string[]=[]; // Se declara un arreglo de las dependencias de NPM normales sin typado
     let property:string=''; // Se declara una variable que almacenara la propiedad o dependencia de NPM
@@ -154,9 +158,10 @@ for(let i=0;i<NPMTypesDepencencies.length;i++){ // inicio de bucle para limpieza
     // 'fs'\;
     NPMTypesDepencencies[i]=NPMTypesDepencencies[i].slice(1,NPMTypesDepencencies[i].lastIndexOf("'")); // Se corta el texto a partir del 1 er caracter " ' " hasta que se encuentra el siguiente " ' "
     // fs
-    NPMTypesDepencencies[i]=NPMTypesDepencencies[i]+" @types/"+NPMTypesDepencencies[i]; // al ser dependencias con typado el comando para instalar es npm i fs @types/fs, por lo cual se anexa junto a la dependencia un @types
-    // fs @types/fs
+   
 }
+NPMDepencencies=NPMDepencencies.filter( (x:any) => !CoreModules.includes(x)); //Eliminamos las dependencias Core de Nodejs
+NPMTypesDepencencies=NPMTypesDepencencies.filter((x:any)=> !CoreModules.includes(x));//Eliminamos las dependencias Core de Nodejs
 console.log(NPMDepencencies, NPMTypesDepencencies);
 
 let command=''; // Variable que contiene el comando principal para la instalacion de las dependencias de NPM
@@ -168,7 +173,7 @@ let command=''; // Variable que contiene el comando principal para la instalacio
     
     }
     for(let i=0;i<NPMTypesDepencencies.length;i++){ // Por cada dependencia normal de NPM
-        command=command+`call npm i ${NPMTypesDepencencies[i]} \n`; // se le concatena un call npm i <dependencia> y un salto de línea " \n "
+        command=command+`call npm i ${NPMTypesDepencencies[i]} @types/${NPMTypesDepencencies[i]} \n`; // se le concatena un call npm i <dependencia> y un salto de línea " \n "
     }
 // command = 
                 // npm i mysql

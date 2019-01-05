@@ -2,7 +2,7 @@ import * as mysql from 'mysql';
 import * as riak  from 'basho-riak-client';
 import * as angular from 'angular';
 let fs = require('fs');
-export class connectMysql {
+export class Mysql {
         public pool: mysql.Pool;
         public config: any;
         constructor(config) {
