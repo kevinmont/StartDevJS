@@ -1,5 +1,5 @@
 {
-    "name": "gatito",
+    "name": "proyectoTEST",
     "model": "mvc",
     "version": "1.0",
     "language": "ts",
@@ -8,12 +8,8 @@
         "mysql": {
             "required": false
         },
-        "mongodb": {
-            "required": false
-        },
-
-        "sftp": {
-
+        "mongodb":{
+            "required":false
         }
     },
     "utils": {

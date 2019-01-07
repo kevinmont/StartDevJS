@@ -92,7 +92,7 @@ let configJSON: Object;
 (()=>Properties.forEach((element:any)=>{  // se obtiene el primer arreglo de propiedades del primer modulo escrito
     element.forEach((element2:any)  =>{  // se obtiene la primera propiedad de este arreglo en este formato this.config.ejemplo.propiedad
     prop=element2.split('.'); // Se separa y genera un arreglo [this,config,ejemplo,propiedad]
-        objectProperty=propertiesRecursive(prop[2],prop); // Se genera un objeto a partir del arreglo de la propiedad generado mediante el metodo PropertiesRecursive y se guarda en la variable objectPorperty
+        objectProperty=propertiesRecursive(prop[2],prop.slice(2,prop.length)); // Se genera un objeto a partir del arreglo de la propiedad generado mediante el metodo PropertiesRecursive y se guarda en la variable objectPorperty
         configObject.push(objectProperty); // Se pushea al array de objetos el objeto generado de la propiedad leída
     });
 }))();
@@ -196,7 +196,7 @@ fspath.writeFileSync(`../src/${proyectName}/install.bat`,command); // Se escribe
  function propertiesRecursive(name: string, properties: string[]){ // Funcioón que recibe un arreglo de propiedades
     let object: any={}; // Se declara un objeto vacio para retornar
     if(properties.indexOf(name)+1!=properties.length){ // si aun no se llega al ultimo indice del arreglo
-        object[name]=propertiesRecursive(properties[properties.indexOf(name)+1],properties); // Se asigna una propiedad del objeto con el valor que retorne la misma funcion al recibir la siguiente propiedad y el mismo arreglo de propiedades
+        object[name]=propertiesRecursive(properties[properties.indexOf(name)+1],properties.slice(properties.indexOf(name)+1,properties.length)); // Se asigna una propiedad del objeto con el valor que retorne la misma funcion al recibir la siguiente propiedad y el mismo arreglo de propiedades
     return object; // retorna el objeto construido
     }else{ // Si si llego a la ultima propiedad
         object[name]=''; // la ultima propiedad se declara como texto vacio ""
@@ -240,7 +240,7 @@ function merge(object1: any, object2: any){ // Funcion que concatena las propied
            console.log("Se agrego..."+JSON.stringify(object1[exclude[i]]));
         }
         for(let i=0;i<includ.length;i++){ // Por las propiedades que estan tanto en los 2 objetos
-            object1[includ[i]]=merge(object1[includ[i]],object2[includ[i]]); // El objeto 1 en la propiedad que apunta el indice i, es igual a lo que retorne el metodo merge al recibir
+            object1[includ[i]]=merge((object1[includ[i]]=='')?{}:object1[includ[i]],object2[includ[i]]); // El objeto 1 en la propiedad que apunta el indice i, es igual a lo que retorne el metodo merge al recibir
             // al recibir los objetos a los que apunta la propiedad en el indice i de ambos objetos
         }
         console.log("Objeto final...-> "+JSON.stringify(object1));

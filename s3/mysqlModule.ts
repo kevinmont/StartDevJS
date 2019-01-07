@@ -1,20 +1,10 @@
-import * as mysql from 'mysql';
-import * as riak  from 'basho-riak-client';
-import * as angular from 'angular';
+import * as mysql from 'fs';
 let fs = require('fs');
 export class Mysql {
         public pool: mysql.Pool;
         public config: any;
-        constructor(config) {
-            this.config=config;
-            this.config= this.config.netsuite.item.pass;
-            this.config=this.config.netsuite.item.name;
-            this.config=this.config.pool.mysql;
-                this.config= this.config.dev.pass;
-                this.config=this.config.dev.username.name.clave;
-                this.config=this.config.dev.username.names.claves;
-                this.config= this.config.dev.username.names.clave1.hola.server.gg.html;
-                this.config=this.config.dev.username.names.clave1.hola2.server.ss;
+        constructor(config:any) {
+            this.config=config
                 this.pool = mysql.createPool( {
                         host: this.config.mysql.host,
                         user: this.config.mysql.user,
@@ -23,7 +13,7 @@ export class Mysql {
                     } );
                 this.pool.getConnection( ( err: any, c: any ) => {
                         if ( c ) {
-                                
+                              console.log("Client MYSQL Conected!!!");  
                             }
                         if ( err ) {
                                 
