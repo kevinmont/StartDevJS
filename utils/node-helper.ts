@@ -1,16 +1,16 @@
 import * as http from 'https';
 import * as path from 'path';
+export class NodeHelper{
 
-let options = {
-  hostname: 'api.github.com',
-  path: '/repos/nodejs/node/contents/lib',
-  method: 'GET',
-  headers: { 'Content-Type': 'application/json', 
-             'user-agent': 'nodejs/node' 
+async  nodeRequest(){
+  let options = {
+    hostname: 'api.github.com',
+    path: '/repos/nodejs/node/contents/lib',
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json', 
+               'user-agent': 'nodejs/node' 
+    }
   }
-}
-
-async function nodeRequest(){
   return new Promise((resolve:any,reject)=>{
     let req=http.request(options, (res:any) => {
       res.setEncoding('utf8')
@@ -31,6 +31,7 @@ async function nodeRequest(){
     req.end();
   })
 }
-export async function getCoreModulesNode(){
-return await  nodeRequest();
+async getCoreModulesNode(){
+return await  this.nodeRequest();
+}
 }

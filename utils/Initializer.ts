@@ -1,17 +1,20 @@
 import * as fs from 'fs';
+export class Initializer{
 
-export function constructInitializer(Modules: string[],ModulesRoute: string[],nameProject: string){
+async constructInitializer(Modules: string[],ModulesRoute: string[],nameProject: string){
+    let initializer: any[]=[];
     for(let i=0;i<ModulesRoute.length;i++){
         ModulesRoute[i]=ModulesRoute[i].slice(0,ModulesRoute[i].length-3);
         ModulesRoute[i]='.'+(ModulesRoute[i].slice(ModulesRoute[i].indexOf(nameProject),ModulesRoute[i].length)).slice(nameProject.length,(ModulesRoute[i].length));
     }
-fs.writeFileSync(`../src/${nameProject}/Initializer.ts`,constructClass(Modules,generateImports(Modules,ModulesRoute)), 'utf8');
-runner(nameProject);
-tsconfig(nameProject);
+initializer.push([`../src/${nameProject}/Initializer.ts`,await this.constructClass(Modules,await this.generateImports(Modules,ModulesRoute))]);
+initializer.push(await this.runner(nameProject));
+initializer.push(await this.tsconfig(nameProject));
+return initializer;
 }
 
 
-function generateImports(Modules: string[],ModulesRoute: string[]){
+async generateImports(Modules: string[],ModulesRoute: string[]){
 let codeImports="";
 for(let i=0;i<Modules.length;i++){
 codeImports=codeImports+`import { ${Modules[i][0].toUpperCase()+Modules[i].slice(1,Modules[i].length)} } from '${ModulesRoute[i]}'; \n`;
@@ -20,7 +23,7 @@ codeImports=codeImports+"import * as fs from 'fs'; \n";
 return codeImports;
 }
 
-function constructClass(Modules: string[], Code: string){
+async constructClass(Modules: string[], Code: string){
 let classCode=Code+"class Initializer{ \npublic config: any; \n";
 let constructorCode="constructor(){ \n this.config= JSON.parse(fs.readFileSync('./config/config.json','utf8')); \n";
 for(let i=0;i<Modules.length;i++){
@@ -29,12 +32,12 @@ for(let i=0;i<Modules.length;i++){
 }
 constructorCode=constructorCode+"}\n";
 classCode=classCode+constructorCode;
-let codeGets=generateGets(Modules);
+let codeGets=this.generateGets(Modules);
 classCode=classCode+codeGets;
 classCode=classCode+"} \nexport default new Initializer();\n";
 return classCode;
 }
-function generateGets(Modules: string[]){
+async generateGets(Modules: string[]){
 let codeGets="";
 for(let i=0;i<Modules.length;i++){
     codeGets=codeGets+`public get${Modules[i][0].toUpperCase()+Modules[i].slice(1,Modules[i].length)}Module(){ \n return this.${Modules[i][0].toLowerCase()+Modules[i].slice(1,Modules[i].length)}; \n }\n`;
@@ -44,15 +47,16 @@ return codeGets;
 }
 
 
-function runner(nameProject:string){
+async runner(nameProject:string){
     let codeConfig="";
     codeConfig=codeConfig+"import Initializer from './Initializer';\n console.log(Initializer);";
-    fs.writeFileSync(`../src/${nameProject}/App.ts`,codeConfig, 'utf8');
+    return [`../src/${nameProject}/App.ts`,codeConfig];
 }
 
-async function tsconfig(nameProject: string){
+async tsconfig(nameProject: string){
 let codetsconfig:any;
 codetsconfig=await fs.readFileSync('../tsconfig.json','utf8');
-fs.writeFileSync(`../src/${nameProject}/tsconfig.json`,codetsconfig, 'utf8');
+return [`../src/${nameProject}/tsconfig.json`,codetsconfig];
 }
 
+}
