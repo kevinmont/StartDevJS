@@ -9,7 +9,8 @@ export class MongoBD{
                 this.config.objeto.name;
                 this.config.appellido.vocales;
                 this.config.objeto.name.hola;
-                
+                this.config.holahola.gg.jj.l.o.p.i;
+                this.config.holahola.gg.jj.l.o.p.i.yyyy.yyyy;
                 this.config.objeto.name.name.name.na;
     public hosla(){
         return "asdasd";

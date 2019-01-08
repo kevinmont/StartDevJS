@@ -1,5 +1,5 @@
-import * as mysql from 'fs';
-let fs = require('fs');
+import * as mysql from 'mysql';
+
 export class Mysql {
         public pool: mysql.Pool;
         public config: any;

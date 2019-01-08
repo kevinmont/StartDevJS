@@ -32,7 +32,7 @@ for(let i=0;i<Modules.length;i++){
 }
 constructorCode=constructorCode+"}\n";
 classCode=classCode+constructorCode;
-let codeGets=this.generateGets(Modules);
+let codeGets=await this.generateGets(Modules);
 classCode=classCode+codeGets;
 classCode=classCode+"} \nexport default new Initializer();\n";
 return classCode;
