@@ -1,4 +1,6 @@
-import * as fspath from 'fs-path';
+import * as fs from 'fs';
+import * as http from 'https';
+import * as path from 'path';
 export class CodeTSJS{
     async readProperties(ModulesCode: any){ // Metodo que obtiene las propiedades del config.json
         let configProperties:string[]=[]; // Se declara un array que contendra las propiedades del codigo funte
@@ -192,4 +194,95 @@ export class CodeTSJS{
         return [`../src/${pathConfig}/config/config.json`,JSON.stringify(configJSON,null,2)]; //Se escribe el fichero config.json global con un formato de ajuste de linea
         }
         
+        async constructInitializer(Modules: string[],ModulesRoute: string[],nameProject: string){ // Metodo encargado de retornar el codigo inicializador de los modulos escritos en el proyecto
+            let initializer: any[]=[];// aqui se guardan los PATH y codigos de los archivos  a escribir
+            for(let i=0;i<ModulesRoute.length;i++){ // Por cada uno de las rutas de los modulos recibidas
+                ModulesRoute[i]=ModulesRoute[i].slice(0,ModulesRoute[i].length-3);//Se eliminará la extencion .ts
+                ModulesRoute[i]='.'+(ModulesRoute[i].slice(ModulesRoute[i].indexOf(nameProject),ModulesRoute[i].length)).slice(nameProject.length,(ModulesRoute[i].length));// Se eliminará la ruta padre para matener la ruta relativa instacta
+            }
+        initializer.push([`../src/${nameProject}/Initializer.ts`,await this.constructClass(Modules,await this.generateImports(Modules,ModulesRoute))]); // Se agrega al array de codigos , el PATH de la clase Intializer y el contenido de dicha clase
+        initializer.push(await this.runner(nameProject)); // Se agrega el PATH del ejecutor de la aplicacion APP o Runner
+        initializer.push(await this.tsconfig(nameProject)); // Se agrega el PATH del tsconfig generado para el proyecto
+        return initializer;  // Se retornan los codigos
+        }
+        
+        
+        async generateImports(Modules: string[],ModulesRoute: string[]){ // Metodo que escribe los import necesarios segun los modulos escritos
+        let codeImports=""; // Variable que guardará el codigo generado de los imports
+        for(let i=0;i<Modules.length;i++){ // Por cada Modulo
+        codeImports=codeImports+`import { ${Modules[i][0].toUpperCase()+Modules[i].slice(1,Modules[i].length)} } from '${ModulesRoute[i]}'; \n`; // Se crea su import correspondiente
+        }
+        codeImports=codeImports+"import * as fs from 'fs'; \n"; // Se agrega a los import el fs para el initializer, ya que es necesario para leer el archivo config.json global
+        return codeImports; // Se retorna el codigo de los imports
+        }
+        
+        async constructClass(Modules: string[], Code: string){ // Metodo que genera constructor de la clase Initilizer
+        let classCode=Code+"class Initializer{ \npublic config: any; \n"; // Se coloca el codigo inicial de la clase asi como la propiedad del archivo config.json global
+        let constructorCode="constructor(){ \n this.config= JSON.parse(fs.readFileSync('./config/config.json','utf8')); \n"; // Se genera el codigo para asignar a la propiedad config el contenido de nuestro archivo config.json
+        for(let i=0;i<Modules.length;i++){ // Por cada modulo a escribir
+            classCode=classCode+`public ${Modules[i][0].toLowerCase()+Modules[i].slice(1,Modules[i].length)}: ${Modules[i][0].toUpperCase()+Modules[i].slice(1,Modules[i].length)}; \n`; // Se genera una variable del tipo de la clase que exporta el modulo a escribir
+            constructorCode=constructorCode+`this.${Modules[i][0].toLowerCase()+Modules[i].slice(1,Modules[i].length)} = new ${Modules[i][0].toUpperCase()+Modules[i].slice(1,Modules[i].length)}(this.config); \n`; // Se inicializa en el constructor cada variable del tipo de clase a la que hace referencia inyectandole el objeto config
+        }
+        constructorCode=constructorCode+"}\n"; // Se agrega un salto de linea al codigo del constructor
+        classCode=classCode+constructorCode; // Se agrega al codigo global de la clase el codigo del constructor
+        let codeGets=await this.generateGets(Modules); // Se generan los codigos de los getters de los modulos para retornas instancias de los modulos
+        classCode=classCode+codeGets; // Se agregan los getters a la clase global de la clase Initializer
+        classCode=classCode+"} \nexport default new Initializer();\n"; // Se agrega un salto de línea y se exporta la clase como una nueva instancia al código de la clase Initializer y se finaliza 
+        return classCode; // Se retorna el codigo de la clase Intializer
+        }
+        async generateGets(Modules: string[]){
+        let codeGets=""; // Se crea la variable que contendra el código de los getters
+        for(let i=0;i<Modules.length;i++){ // Por cada modulo a escribir
+            codeGets=codeGets+`public get${Modules[i][0].toUpperCase()+Modules[i].slice(1,Modules[i].length)}Module(){ \n return this.${Modules[i][0].toLowerCase()+Modules[i].slice(1,Modules[i].length)}; \n }\n`; // Se escribe una funcion getter del Modulo
+        }
+        
+        return codeGets; // Se retorna el codigo de los getters
+        }
+        
+        
+        async runner(nameProject:string){ // Este metodo crea la clase App o Runner que ejectura el programa principal del proyecto
+            let codeAppRunner=""; // Se inicializa la variable que contendra el codigo de 
+            codeAppRunner=codeAppRunner+"import Initializer from './Initializer';\n console.log(Initializer);"; // Se escribe el codigo de la clase App o Runner
+            return [`../src/${nameProject}/App.ts`,codeAppRunner]; // Se retorna el PATH a escribir el Modulo APP o Runner y el codigo fuente de la clase
+        }
+        
+        async tsconfig(nameProject: string){ // Metodo que escribe el archivo tsconfig.json del proyecto
+        let codetsconfig:any; // Se crea la variable que contendra el codigo del archivo
+        codetsconfig=await fs.readFileSync('../tsconfig.json','utf8'); // Se leé el contenido del archivo del proyecto STARTDEVJS
+        return [`../src/${nameProject}/tsconfig.json`,codetsconfig]; // Se retorna el PATH de escritura y el codigo del archivo tsconfig.json
+        }
+
+
+        async  nodeRequest(){ // Metodo que retorna las dependencias Core de Nodejs
+            let options = {
+              hostname: 'api.github.com',
+              path: '/repos/nodejs/node/contents/lib',
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json', 
+                         'user-agent': 'nodejs/node' 
+              }
+            }
+            return new Promise((resolve:any,reject)=>{ // Retorno de una nueva promesa
+              let req=http.request(options, (res:any) => { // Se crea la variable que contendra la peticion
+                res.setEncoding('utf8') // el response se adapta a la codificacion utf8
+                var body:any = ""; // Se crea la variable body que contendra el cuerpo de la respuesta a la petición http
+                res.on('data', (data:any) => { body += data }) // Se asigna el valor data del reponse a la variable body
+                res.on('end', () => { // cuando termine la solicitud
+                  var list:any = [] // Se crea una lista de dependencias
+                  body = JSON.parse(body) // Se parsea el body a JSON para obtener sus propiedades
+                  body.forEach( (f:any) => { // Por cada propiedad del body
+                    if (f.type === 'file' && f.name[0]!=='_' && f.name[0]!=='.') { // Se filtran los que son archivos 
+                      list.push(path.basename(f.name,'.js'))// Se agrega a la lista de depdencias el nombre de la depedencia
+                    }
+                  })
+                  resolve(list); // Se resuelve la promesa retornando la lista de los modulos Core de node js
+                })
+               
+              })
+              req.end(); // Se finaliza la solicitud request
+            })
+          }
+          async getCoreModulesNode(){ // Metodo que obtiene los modulos Core de node js
+          return await  this.nodeRequest(); // Se retorna la respuesta del metodo asincrono nodeRequets
+          }
 }

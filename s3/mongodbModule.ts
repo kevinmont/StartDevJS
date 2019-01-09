@@ -1,18 +1,29 @@
-'use-strict'
-export class MongoBD{
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
+export class Mongodb{
+// Connection URL
 
-    public hola= this.config.mongo.host
-    .ff
-    public gg= this.config.mongo1.name.hola.jj.sergio.nacio.en.mendoza
-                this.config.jose.hola;
+public url:string;
+public config: any;
+ 
+// Database Name
+public dbName:string;
+constructor(config:any){
+    this.config=config;
+this.url=this.config.mongodb.url;
+this.dbName=this.config.mongodb.dbName;
+} 
+ 
+// Use connect method to connect to the server
+async connect(){
+MongoClient.connect(this.url, function(err:any, client:any) {
+  assert.equal(null, err);
+  console.log("Connected successfully to server");
+ 
+  const db = client.db(this.dbName);
+ 
+  console.log(db);
 
-                this.config.objeto.name;
-                this.config.appellido.vocales;
-                this.config.objeto.name.hola;
-                this.config.holahola.gg.jj.l.o.p.i;
-                this.config.holahola.gg.jj.l.o.p.i.yyyy.yyyy;
-                this.config.objeto.name.name.name.na;
-    public hosla(){
-        return "asdasd";
-    }
+});
+}
 }

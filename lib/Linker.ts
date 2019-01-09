@@ -2,13 +2,10 @@ import { CodeTSJS } from './CodeTSJS';
 import * as fs from 'fs';
 import * as fspath from 'fs-path';
 import { NodeHelper } from '../utils/node-helper';
-import { Initializer } from '../utils/Initializer';
 export class Linker{
         public tsjs: CodeTSJS;
     async Build(data:any,response:any,language:string){
         this.tsjs=new CodeTSJS();
-        let nodeHelper: NodeHelper= new NodeHelper();
-        let initializer: Initializer= new Initializer();
         let ModulesPath:string[] = [];
         let initClass:any[]=[];
         let PATH:string='';
@@ -16,7 +13,7 @@ export class Linker{
         let properties:any[]=[];
         let modulesName:any=Object.keys(response['modules']); //Se obtienen los metadatos de los modulos a generar
         let npmDep:string[]=[];
-        let CoreModules=await nodeHelper.getCoreModulesNode();
+        let CoreModules=await this.tsjs.getCoreModulesNode();
         for(let i=0;i<modulesName.length;i++){ // por cada modulo se procede a realizar las siguientes operaciones
             PATH=`../src/${data['name']}/${response['pattern']['Libs']}/${modulesName[i]}Module.ts`; //Creando el path de escritura de los modulos solicitados a generar
             ModulesPath.push(PATH); //Se guardan los directorios de los modulos generados
@@ -29,7 +26,7 @@ export class Linker{
             npmDep.push(npmDepRes); // Se agregan dichas dependencias a un array
         }    
     }
-            initClass= await initializer.constructInitializer(modulesName,ModulesPath,data['name']);
+            initClass= await this.tsjs.constructInitializer(modulesName,ModulesPath,data['name']);
             for(let i=0;i<initClass.length;i++){
                 results.push(initClass[i]);
             }
