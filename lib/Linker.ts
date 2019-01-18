@@ -1,7 +1,6 @@
 import { CodeTSJS } from './CodeTSJS';
 import * as fs from 'fs';
 import * as fspath from 'fs-path';
-import { NodeHelper } from '../utils/node-helper';
 export class Linker{
         public tsjs: CodeTSJS;
     async Build(data:any,response:any,language:string){
@@ -32,6 +31,9 @@ export class Linker{
             }
             results.push(await this.tsjs.installNPMDependencies(npmDep,data['name'])); // El arreglos con las dependencias de NPM y el nombre del proyecto se mandan al metodo InstallNPMDepdencies
             results.push(await this.tsjs.buildConfigJSON(properties,data['name']));// Se mandan las propiedades de todos los modulo y el nombre del proyecto para generar el archivo de configuración
+            results.push(await this.tsjs.buildController(data['name'],response));
+            results.push(await this.tsjs.buildRouteClass(data['name'],response));
+            results.push(await this.tsjs.buildServerClass(data['name']));
             return results;
         
 

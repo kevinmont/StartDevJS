@@ -89,6 +89,8 @@ export class CodeTSJS{
     }
     NPMDepencencies=NPMDepencencies.filter( (x:any) => !CoreModules.includes(x)); //Eliminamos las dependencias Core de Nodejs
     NPMTypesDepencencies=NPMTypesDepencencies.filter((x:any)=> !CoreModules.includes(x));//Eliminamos las dependencias Core de Nodejs
+    NPMTypesDepencencies.push('express');
+    NPMTypesDepencencies.push('body-parser');
     console.log(NPMDepencencies, NPMTypesDepencencies);
     
     let command=''; // Variable que contiene el comando principal para la instalacion de las dependencias de NPM
@@ -241,15 +243,27 @@ export class CodeTSJS{
         
         
         async runner(nameProject:string){ // Este metodo crea la clase App o Runner que ejectura el programa principal del proyecto
-            let codeAppRunner=""; // Se inicializa la variable que contendra el codigo de 
-            codeAppRunner=codeAppRunner+"import Initializer from './Initializer';\n console.log(Initializer);"; // Se escribe el codigo de la clase App o Runner
-            return [`../src/${nameProject}/App.ts`,codeAppRunner]; // Se retorna el PATH a escribir el Modulo APP o Runner y el codigo fuente de la clase
+            // Se inicializa la variable que contendra el codigo de 
+            let codeAppRunner=await fs.readFileSync(`../s3/App.ts`); // Se escribe el codigo de la clase App o Runner
+            return [`../src/${nameProject}/App.ts`,codeAppRunner.toString('utf8')]; // Se retorna el PATH a escribir el Modulo APP o Runner y el codigo fuente de la clase
         }
         
         async tsconfig(nameProject: string){ // Metodo que escribe el archivo tsconfig.json del proyecto
         let codetsconfig:any; // Se crea la variable que contendra el codigo del archivo
-        codetsconfig=await fs.readFileSync('../tsconfig.json','utf8'); // Se leé el contenido del archivo del proyecto STARTDEVJS
-        return [`../src/${nameProject}/tsconfig.json`,codetsconfig]; // Se retorna el PATH de escritura y el codigo del archivo tsconfig.json
+        codetsconfig={
+            compilerOptions:{
+                noImplicitAny: true,
+                target: "es5",
+                outDir: "./src/",
+                typeRoots: [
+            "./node_modules/@types"
+                ],
+                lib: [ "es2015" ] 
+            }
+        }
+        // Se leé el contenido del archivo del proyecto STARTDEVJS
+
+        return [`../src/${nameProject}/tsconfig.json`,JSON.stringify(codetsconfig,null,2)]; // Se retorna el PATH de escritura y el codigo del archivo tsconfig.json
         }
 
 
@@ -284,5 +298,21 @@ export class CodeTSJS{
           }
           async getCoreModulesNode(){ // Metodo que obtiene los modulos Core de node js
           return await  this.nodeRequest(); // Se retorna la respuesta del metodo asincrono nodeRequets
+          }
+
+          async buildController(projectName: string,response: any){
+            let codeController="";
+            codeController=codeController+"import Intializer from '../Initializer';\n export class Controller{ \n //Aqui colocaras los metodos para cada unos de los Routes  \n async ping(req:any,res:any){\nreturn 'ping success';\n}\n}";
+            return [`../src/${projectName}/${response['pattern']['Controller']}/Controller.ts`,codeController];
+          }
+
+          async buildRouteClass(projectName:string,response:any){
+            let codeRoute=await fs.readFileSync(`../s3/Route.ts`);
+            return [`../src/${projectName}/${response['pattern']['Routes']}/Route.ts`,codeRoute.toString('utf8')];
+          }
+          
+          async buildServerClass(projectName: String){
+            let codeServer=await fs.readFileSync(`../s3/Server.ts`);
+            return [`../src/${projectName}/Server.ts`,codeServer.toString('utf8')];
           }
 }

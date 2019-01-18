@@ -3,6 +3,7 @@
     "Libs": "Libs",
     "Models": "Models",
     "Controller": "Controller",
+    "Routes":"Routes",
     "Utils": "Utils",
     "ServerApp": "App"
 }
