@@ -15,7 +15,7 @@ Configurar modulos:
     }
 Eliminar el modulo que no necesites...
 
-Ingresar al path del proyecto:
+Ingresar al path del proyecto en la carpeta StartDevJS:
 
 e ingresar el comando 
 
