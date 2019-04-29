@@ -1,18 +1,20 @@
 import * as writter from './writter';
 import * as fs from 'fs';
 import { Writter } from './writter';
+import * as rq from 'request-promise';
+import StartDevHttpsRequest from './http-startdev';
+const startDevHttpsRequest = new StartDevHttpsRequest();
 class Reader{
 public builder: Writter;
 public lang:any;
 public languages: any;
 public isValid: boolean;
-constructor(){
-   this.lang= fs.readFileSync('../utils/languagesDef.json');
-   this.languages=JSON.parse(this.lang);
+constructor (){
    this.isValid=false;
    this.builder=new Writter();
 }
  async  readStartDevFile(PATH: string){
+    this.languages = JSON.parse(await startDevHttpsRequest.getLangs());
     let data: any = fs.readFileSync(PATH);
     data = JSON.parse(data);
     

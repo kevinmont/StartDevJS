@@ -1,6 +1,7 @@
-import * as servlet from './http-startdev';
+import  StartDevHttpsRequest from './http-startdev';
 import * as fspath from 'fs-path';
 import { Linker } from './Linker';
+const servlet = new StartDevHttpsRequest();
 export class Writter{
     public linker: Linker;
     constructor(){

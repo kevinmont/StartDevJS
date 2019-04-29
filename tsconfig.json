@@ -1,6 +1,7 @@
 {
     "files":[
-        "startdevjs/index.ts"
+        "startdevjs/index.ts",
+        "utils/updatedConfig.ts"
     ],
     "compilerOptions": {
         "noImplicitAny": true,

@@ -1,5 +1,5 @@
 {
-    "name": "proyectoTEST",
+    "name": "proyectogestion",
     "model": "mvc",
     "version": "1.0",
     "language": "ts",
@@ -7,9 +7,6 @@
 
         "mysql": {
             "required": false
-        },
-        "mongodb":{
-            "required":false
         }
     },
     "utils": {

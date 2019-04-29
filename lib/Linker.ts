@@ -1,6 +1,7 @@
 import { CodeTSJS } from './CodeTSJS';
 import * as fs from 'fs';
 import * as fspath from 'fs-path';
+import * as rq from 'request-promise';
 export class Linker{
         public tsjs: CodeTSJS;
     async Build(data:any,response:any,language:string){
@@ -16,11 +17,20 @@ export class Linker{
         for(let i=0;i<modulesName.length;i++){ // por cada modulo se procede a realizar las siguientes operaciones
             PATH=`../src/${data['name']}/${response['pattern']['Libs']}/${modulesName[i]}Module.ts`; //Creando el path de escritura de los modulos solicitados a generar
             ModulesPath.push(PATH); //Se guardan los directorios de los modulos generados
-            let content=await fs.readFileSync(`../s3/${modulesName[i]}Module.ts`);// Se leén los modulos desde s3 para obtener el codigo fuente de los modulos
-            console.log(content.toString('utf-8')); // El buffer se cambia a string para poder leér el codigo fuente
-            await fspath.writeFileSync(PATH,content.toString('utf-8')); // Se escribe el modulo en el directorio antes generado
-            properties.push(await this.tsjs.readProperties(content.toString('utf-8'))); // Se obtienen las propiedades del codigo fuente para generar el config.json global
-            let npmDepRes=await this.tsjs.readNpmDependencies(await content.toString('utf-8'),CoreModules); // Se obtienen las dependencias de NPM solicitadas en el codigo fuente
+            let content= ""; 
+            await rq({
+                method: 'POST',
+                uri: 'http://localhost:4000/startdev/code/provider',
+                body: {
+                    lang: language,
+                    module: modulesName[i]
+                },
+                json: true
+             }).then(response=> content = response['code']);// Se leén los modulos desde s3 para obtener el codigo fuente de los modulos
+            console.log(content); // El buffer se cambia a string para poder leér el codigo fuente
+            await fspath.writeFileSync(PATH,content); // Se escribe el modulo en el directorio antes generado
+            properties.push(await this.tsjs.readProperties(content)); // Se obtienen las propiedades del codigo fuente para generar el config.json global
+            let npmDepRes=await this.tsjs.readNpmDependencies(await content,CoreModules); // Se obtienen las dependencias de NPM solicitadas en el codigo fuente
             if(npmDepRes!=""){ // Si hay dependencias a descargar de NPM 
             npmDep.push(npmDepRes); // Se agregan dichas dependencias a un array
         }    
